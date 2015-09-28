@@ -1,5 +1,6 @@
 var mysql      = require('mysql');
 var Promise = require('bluebird');
+var colors = require('colors');
 Promise.promisifyAll(mysql);
 Promise.promisifyAll(require("mysql/lib/Connection").prototype);
 Promise.promisifyAll(require("mysql/lib/Pool").prototype);
@@ -25,16 +26,21 @@ connection.queryAsync('SHOW DATABASES').then(
     }
 ).map(
     function(row) {
-        return connection.queryAsync('SHOW TABLES FROM ' + row.Database)
+        return connection.queryAsync('SHOW TABLES FROM ' + row.Database).then(
+            function(result) {
+                var rows = result[0];
+                return {databaseName: row.Database, tableNames: rows};
+            }
+        );
     }
 ).then(
     function(mappedRows) {
-        console.dir(mappedRows[0]); // each of the mappedRows is a `queryAsync` result. it's an array of [rows, fields]
-        // console.log("These are all the tables from each database:");
-        for (var i = 0; i < mappedRows.length; i++) {
-            var mappedRow = mappedRows[i];
-            console.log(mappedRow);
-        }
+        mappedRows.forEach(function(dbAndTables) {
+            console.log(dbAndTables.databaseName.bold + ": ");
+            dbAndTables.tableNames.forEach(function(tableName) {
+                console.log(tableName['Tables_in_' + dbAndTables.databaseName].rainbow);
+            });
+        });
     }
 ).finally(
     function() {
