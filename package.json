@@ -12,5 +12,8 @@
     "intro"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "mysql": "^2.9.0"
+  }
 }
