@@ -21,5 +21,10 @@ connection.queryAsync('SELECT 1 + 1 AS solution').then(
     function(result) {
         var rows = result[0];
         console.log("The rows of the query are: ", rows);
+        
     }
-);
+).finally(
+    function() {
+        connection.end();
+    }
+)
