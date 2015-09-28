@@ -22,6 +22,12 @@ connection.queryAsync('SELECT 1 + 1 AS solution').then(
         var rows = result[0];
         console.log("The rows of the query are: ", rows);
         
+        return connection.queryAsync('SHOW DATABASES');
+    }
+).then(
+    function(result) {
+        var rows = result[0];
+        console.log("The databases in this mysql instance are: ", rows);
     }
 ).finally(
     function() {
