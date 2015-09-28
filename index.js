@@ -28,7 +28,9 @@ connection.queryAsync('SHOW DATABASES').then(
     function(row) {
         return connection.queryAsync('SHOW TABLES FROM ' + row.Database).then(
             function(result) {
-                var rows = result[0];
+                var rows = result[0].map(function(tableRow) {
+                    return tableRow['Tables_in_' + row.Database];
+                });
                 return {databaseName: row.Database, tableNames: rows};
             }
         );
@@ -36,10 +38,15 @@ connection.queryAsync('SHOW DATABASES').then(
 ).then(
     function(mappedRows) {
         mappedRows.forEach(function(dbAndTables) {
-            console.log(dbAndTables.databaseName.bold + ": ");
-            dbAndTables.tableNames.forEach(function(tableName) {
-                console.log(tableName['Tables_in_' + dbAndTables.databaseName].rainbow);
-            });
+            if (dbAndTables.tableNames.length) {
+                console.log(dbAndTables.databaseName.bold + ": ");
+                dbAndTables.tableNames.forEach(function(tableName) {
+                    console.log("\t" + tableName.rainbow);
+                });
+            }
+            else {
+                console.log( (dbAndTables.databaseName + " does not have any tables").bold.red ); 
+            }
         });
     }
 ).finally(
